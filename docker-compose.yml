@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    container_name: cakephp-php
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./UreruCakephp:/var/www/html 
+    depends_on:
+      - mysql
+    networks:
+      - cakephp-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-cakephp
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: cakephp_db
+      MYSQL_USER: cakephp_user
+      MYSQL_PASSWORD: cakephp_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - cakephp-network
+
+networks:
+  cakephp-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

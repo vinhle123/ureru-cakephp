@@ -1,0 +1,13 @@
+FROM amazonlinux:2023
+
+RUN dnf update -y && dnf upgrade -y && \
+    dnf install -y nc gcc-c++ ncurses make gcc make openssl openssh which nano libzip libzip-devel dos2unix \
+    php8.2 php-pear php8.2-{devel,common,fpm,mbstring,gd,mysqlnd,bcmath,xml,intl,zip,sodium}
+
+
+WORKDIR /var/www/html
+COPY ./UreruCakephp /var/www/html
+
+EXPOSE 8080
+
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html/webroot"]
