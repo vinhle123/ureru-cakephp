@@ -1,13 +1,25 @@
 FROM amazonlinux:2023
 
+# Update and install necessary packages
 RUN dnf update -y && dnf upgrade -y && \
     dnf install -y nc gcc-c++ ncurses make gcc make openssl openssh which nano libzip libzip-devel dos2unix \
     php8.2 php-pear php8.2-{devel,common,fpm,mbstring,gd,mysqlnd,bcmath,xml,intl,zip,sodium}
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
 
+# Copy CakePHP source code into the container
 WORKDIR /var/www/html
 COPY ./UreruCakephp /var/www/html
 
+# Install dependencies with Composer
+RUN composer install
+
+# Set proper permissions for CakePHP's tmp and logs directories
+RUN chown -R apache:apache /var/www/html/tmp /var/www/html/logs && chmod -R 777 /var/www/html/tmp /var/www/html/logs
+
+# Expose port 8080 for the PHP built-in server
 EXPOSE 8080
 
+# Run PHP built-in server when the container starts
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html/webroot"]
